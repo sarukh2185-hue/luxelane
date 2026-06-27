@@ -222,7 +222,7 @@ function renderShopGrid(items) {
 function initFeaturedProducts() {
   const grid = document.getElementById('featured-products');
   if (!grid) return;
-  const featured = PRODUCTS.filter(p => [1, 2, 9].includes(p.id));
+  const featured = PRODUCTS.slice(0, 15);
   grid.innerHTML = featured.map(createProductCard).join('');
 }
 
