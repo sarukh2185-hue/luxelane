@@ -2,7 +2,7 @@
    Luxe Lane — Cart & Product Logic
    ============================================ */
 
-const PRODUCTS = [
+const BASE_PRODUCTS = [
   { id: 1, name: 'Coral Silk Blouse', category: 'Tops', price: 1899, image: 'assets/product-01.jpg', badge: 'New' },
   { id: 2, name: 'Sage Linen Dress', category: 'Dresses', price: 2499, image: 'assets/product-02.jpg', badge: 'Bestseller' },
   { id: 3, name: 'Burgundy Cashmere Sweater', category: 'Knitwear', price: 2799, image: 'assets/product-03.jpg', badge: '' },
@@ -19,6 +19,8 @@ const PRODUCTS = [
   { id: 14, name: 'Charcoal Wool Coat', category: 'Outerwear', price: 2999, image: 'assets/product-14.jpg', badge: 'Premium' },
   { id: 15, name: 'Multi-Color Silk Scarf Set', category: 'Accessories', price: 2499, image: 'assets/product-15.jpg', badge: '' }
 ];
+
+const PRODUCTS = BASE_PRODUCTS.concat(typeof EXTRA_PRODUCTS !== 'undefined' ? EXTRA_PRODUCTS : []);
 
 const CART_KEY = 'luxelane_cart';
 
@@ -186,7 +188,35 @@ function createProductCard(product) {
 function initShopPage() {
   const grid = document.getElementById('shop-grid');
   if (!grid) return;
-  grid.innerHTML = PRODUCTS.map(createProductCard).join('');
+
+  const countEl = document.getElementById('shop-count');
+  if (countEl) countEl.textContent = PRODUCTS.length;
+
+  renderShopGrid(PRODUCTS);
+
+  const filters = document.getElementById('shop-filters');
+  if (!filters) return;
+
+  const categories = ['All', ...new Set(PRODUCTS.map(p => p.category))];
+  filters.innerHTML = categories.map(cat =>
+    `<button class="filter-btn${cat === 'All' ? ' active' : ''}" data-category="${cat}">${cat}</button>`
+  ).join('');
+
+  filters.addEventListener('click', (e) => {
+    const btn = e.target.closest('.filter-btn');
+    if (!btn) return;
+    filters.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const cat = btn.dataset.category;
+    const filtered = cat === 'All' ? PRODUCTS : PRODUCTS.filter(p => p.category === cat);
+    renderShopGrid(filtered);
+  });
+}
+
+function renderShopGrid(items) {
+  const grid = document.getElementById('shop-grid');
+  if (!grid) return;
+  grid.innerHTML = items.map(createProductCard).join('');
 }
 
 function initFeaturedProducts() {
